@@ -1,0 +1,372 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Food Court',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: FoodCourt(),
+    );
+  }
+}
+
+class FoodCourt extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Food Court'),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Text('Menu'),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+            ),
+            ListTile(
+              title: Text('Screen 1'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => Screen1()));
+              },
+            ),
+            ListTile(
+              title: Text('Screen 2'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => Screen2()));
+              },
+            ),
+          ],
+        ),
+      ),
+      body: Container(
+        child: GridView.count(
+          crossAxisCount: 2,
+          children: <Widget>[
+            FoodCard(
+              image: 'images/hamburger.jpg',
+              name: 'Burger',
+              price: '\$5.00',
+            ),
+            FoodCard(
+              image: 'images/hotdog.jpg',
+              name: 'Pizza',
+              price: '\$10.00',
+            ),
+            FoodCard(
+              image: 'images/pizza.jpg',
+              name: 'Fries',
+              price: '\$3.00',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Screen1 extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Screen 1'),
+      ),
+      body: ListView(
+        children: <Widget>[
+          ListTile(
+            title: Text('Item 1'),
+          ),
+          ListTile(
+            title: Text('Item 2'),
+          ),
+          ListTile(
+            title: Text('Item 3'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class Screen2 extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Screen 2'),
+      ),
+      body: ListView(
+        children: <Widget>[
+          ListTile(
+            title: Text('Item 1'),
+          ),
+          ListTile(
+            title: Text('Item 2'),
+          ),
+          ListTile(
+            title: Text('Item 3'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class FoodCard extends StatefulWidget {
+  final String image;
+  final String name;
+  final String price;
+
+  FoodCard({required this.image, required this.name, required this.price});
+
+  @override
+  _FoodCardState createState() => _FoodCardState();
+}
+
+class _FoodCardState extends State<FoodCard> {
+  bool _selected = false;
+
+  void _onSelected() {
+    setState(() {
+      _selected = !_selected;
+      if (_selected) {
+        cart.add(widget.name, widget.price);
+      } else {
+        cart.remove(widget.name);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+margin: EdgeInsets.all(10),
+child: Column(
+crossAxisAlignment: CrossAxisAlignment.stretch,
+children: <Widget>[
+Expanded(
+child: GestureDetector(
+onTap: () {
+Navigator.push(
+context,
+MaterialPageRoute(
+builder: (context) => DetailPage(
+image: widget.image,
+name: widget.name,
+price: widget.price,
+)));
+},
+child: ClipRRect(
+borderRadius: BorderRadius.circular(10),
+child: Image.asset(
+widget.image,
+fit: BoxFit.cover,
+),
+),
+),
+),
+SizedBox(
+height: 10,
+),
+Text(
+widget.name,
+style: TextStyle(
+fontSize: 18,
+fontWeight: FontWeight.bold,
+),
+),
+SizedBox(
+height: 5,
+),
+Text(
+widget.price,
+style: TextStyle(
+fontSize: 16,
+),
+),
+SizedBox(
+height: 5,
+),
+ElevatedButton(
+onPressed: _onSelected,
+style: ButtonStyle(
+backgroundColor: MaterialStateProperty.all(
+_selected ? Colors.green : Colors.blue),
+foregroundColor: MaterialStateProperty.all(Colors.white),
+shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+RoundedRectangleBorder(
+borderRadius: BorderRadius.circular(10.0),
+)),
+),
+child: Text(
+_selected ? 'Added to Cart' : 'Add to Cart',
+style: TextStyle(fontSize: 16),
+),
+),
+],
+),
+);
+}
+}
+
+class DetailPage extends StatelessWidget {
+final String image;
+final String name;
+final String price;
+
+DetailPage({required this.image, required this.name, required this.price});
+
+@override
+Widget build(BuildContext context) {
+return Scaffold(
+appBar: AppBar(
+title: Text(name),
+),
+body: Container(
+child: Column(
+crossAxisAlignment: CrossAxisAlignment.stretch,
+children: <Widget>[
+Expanded(
+child: ClipRRect(
+borderRadius: BorderRadius.circular(10),
+child: Image.asset(
+image,
+fit: BoxFit.cover,
+),
+),
+),
+SizedBox(
+height: 10,
+),
+Padding(
+padding: EdgeInsets.symmetric(horizontal: 20),
+child: Column(
+crossAxisAlignment: CrossAxisAlignment.start,
+children: <Widget>[
+Text(
+name,
+style: TextStyle(
+fontSize: 24,
+fontWeight: FontWeight.bold,
+),
+),
+SizedBox(
+height: 10,
+),
+Text(
+price,
+style: TextStyle(
+fontSize: 20,
+color: Colors.blue,
+),
+),
+SizedBox(
+height: 20,
+),
+ElevatedButton(
+onPressed: () {
+cart.add(name, price);
+ScaffoldMessenger.of(context).showSnackBar(
+SnackBar(
+content: Text('$name added to cart.'),
+),
+);
+},
+style: ButtonStyle(
+backgroundColor:
+MaterialStateProperty.all(Colors.green),
+foregroundColor:
+MaterialStateProperty.all(Colors.white),
+shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+RoundedRectangleBorder(
+borderRadius: BorderRadius.circular(10.0),
+)),
+),
+child: Text(
+'Add to Cart',
+style: TextStyle(fontSize: 20),
+),
+),
+],
+),
+),
+],
+),
+),
+);
+}
+}
+
+class Cart {
+List<String> _items = [];
+List<String> _prices = [];
+
+void add(String item, String price) {
+_items.add(item);
+_prices.add(price);
+}
+
+void remove(String item) { 
+  int index = _items.indexOf(item);
+if (index != -1) {
+_items.removeAt(index);
+_prices.removeAt(index);
+}
+}
+
+class Cart extends StatelessWidget {
+@override
+Widget build(BuildContext context) {
+return Scaffold(
+appBar: AppBar(
+title: Text('Cart'),
+),
+body: ListView.builder(
+itemCount: cart._items.length,
+itemBuilder: (context, index) {
+return ListTile(
+title: Text(cart._items[index]),
+trailing: Text(cart._prices[index]),
+);
+},
+),
+);
+}
+}
+
+final cart = CartItems();
+
+class CartItems {
+final List<String> _items = [];
+final List<String> _prices = [];
+
+void add(String item, String price) {
+_items.add(item);
+_prices.add(price);
+}
+
+void remove(String item) {
+int index = _items.indexOf(item);
+if (index != -1) {
+_items.removeAt(index);
+_prices.removeAt(index);
+}
+}
+}
+}
